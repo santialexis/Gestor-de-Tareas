@@ -17,5 +17,11 @@ while(opcion != 0):
             menu.crearTareaMenu()
         case 2:
             menu.modificarTareaMenu()
+        case 3:
+            menu.eliminarTareaMenu()
+        case 4:
+            menu.listarTareasMenu()
         case 0:
-            print("Saliendo...")
+            print("\nSaliendo...")
+    
+    val.limpiarPantalla()

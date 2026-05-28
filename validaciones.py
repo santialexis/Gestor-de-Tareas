@@ -1,4 +1,6 @@
 from enum import Enum
+import os
+import datetime
 import json
 
 PATH = "Gestor-de-Tareas/tareas.json"
@@ -7,7 +9,7 @@ class estadoTarea(Enum):
     PENDIENTE = "Pendiente"
     EN_CURSO = "En Curso"
     TERMINADA = "Terminada"
-    
+
 
 def leerContenidoJson():
     try:
@@ -43,6 +45,36 @@ def validarEstado():
             print("Ingrese un estado valido!")
         else:
             return estado.capitalize()
+        
+def validarFecha():
+    while(True):
+        fecha = input("-> ")
+        if(not fecha.strip()):
+            return fecha
+        try:
+            datetime.date.fromisoformat(fecha)
+            return fecha
+        except ValueError:
+            print("Fecha no valida!")
+
+def buscarTareaConId(contenido):
+    while(True):
+        id_tarea = input("-> ")
+        if(not id_tarea.strip()):
+            return None
+
+        tarea = contenido["tareas"].get(id_tarea)
+        if (tarea is None) or (tarea["eliminada"]):
+            print("ID no existente!")
+        else:
+            return id_tarea
+
+
+def limpiarPantalla():
+    if(os.name == 'nt'):
+        os.system("cls")
+    else:
+        os.system("clear")
 
 
 def continuar():

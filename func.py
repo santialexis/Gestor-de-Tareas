@@ -46,3 +46,38 @@ def modificarTarea(contenido, id_tarea, nuevo_nombre, nueva_desc, nuevo_estado):
         json.dump(contenido,f,indent=4)
 
     return se_modifico
+
+
+def eliminarTarea(contenido, id_tarea):
+    contenido["tareas"][id_tarea]["eliminada"] = True
+    with open(PATH,"w") as f:
+        json.dump(contenido,f,indent=4)
+    return 1
+
+
+def listarTareas(contenido, estado, fecha):
+    tareas = contenido["tareas"]
+
+    res = {
+        id_tarea: tarea for id_tarea,tarea in tareas.items()
+        if(not(estado.strip()) or tarea.get("estado") == estado)
+        and (not(fecha.strip()) or tarea.get("fecha_creacion") == fecha)
+        and (not(tarea.get("eliminada")))
+    }
+
+    imprimirTareas(res)
+    return 1
+
+
+def imprimirTareas(tareas):
+    print("\n===================================================================")
+    for id_t,t in tareas.items():
+        nombre = t.get("nombre")
+        estado = t.get("estado")
+        fecha_ini = t.get("fecha_creacion")
+        fecha_mod = t.get("fecha_mod")
+        desc = t.get("descripcion")
+        print(f"ID: {id_t} // Nombre: {nombre} // Estado: {estado}")
+        print(f"Fecha de creacion: {fecha_ini} // Ultima modificacion: {fecha_mod}")
+        print(f"Descripcion: {desc}")
+        print("===================================================================")
