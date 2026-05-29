@@ -1,15 +1,18 @@
 import json
 import datetime
+import validaciones as val
 
-PATH = "Gestor-de-Tareas/tareas.json"
+PATH = "tareas.json"
 
-def crearTarea(contenido,nombre,desc,estado):
+def crearTarea(nombre,estado,desc):
+    contenido = val.leerContenidoJson()
     tarea_id = contenido["ultimoID"] + 1
+
     fechaCreacion = str(datetime.datetime.now().date())
     nuevaTarea = {
         "nombre" : nombre,
         "descripcion" : desc,
-        "estado" : estado if estado.strip() else "Pendiente",
+        "estado" : estado if estado else "Pendiente",
         "fecha_creacion" : fechaCreacion,
         "fecha_mod" : fechaCreacion,
         "eliminada" : False
@@ -18,29 +21,29 @@ def crearTarea(contenido,nombre,desc,estado):
     contenido["tareas"][tarea_id] = nuevaTarea
     contenido["ultimoID"] = tarea_id
 
-    with open(PATH,"w") as f:
-        json.dump(contenido,f,indent=4)
-    
+    val.escribirJson(contenido)
     return tarea_id
 
 
-def modificarTarea(contenido, id_tarea, nuevo_nombre, nueva_desc, nuevo_estado):
+def modificarTarea(id, nuevo_nombre, nuevo_estado, nueva_desc):
+    contenido = val.leerContenidoJson()
     se_modifico = False
+    id = str(id)
 
-    if(nuevo_nombre.strip()):
-        contenido["tareas"][id_tarea]["nombre"] = nuevo_nombre
+    if(nuevo_nombre is not None):
+        contenido["tareas"][id]["nombre"] = nuevo_nombre
         se_modifico = True
     
-    if(nueva_desc.strip()):
-        contenido["tareas"][id_tarea]["descripcion"] = nueva_desc
+    if(nueva_desc is not None):
+        contenido["tareas"][id]["descripcion"] = nueva_desc
         se_modifico = True
     
-    if(nuevo_estado.strip()):
-        contenido["tareas"][id_tarea]["estado"] = nuevo_estado
+    if(nuevo_estado is not None):
+        contenido["tareas"][id]["estado"] = nuevo_estado
         se_modifico = True
 
     if(se_modifico):
-        contenido["tareas"][id_tarea]["fecha_mod"] = str(datetime.datetime.now().date())
+        contenido["tareas"][id]["fecha_mod"] = str(datetime.datetime.now().date())
     
     with open(PATH,"w") as f:
         json.dump(contenido,f,indent=4)
@@ -48,20 +51,23 @@ def modificarTarea(contenido, id_tarea, nuevo_nombre, nueva_desc, nuevo_estado):
     return se_modifico
 
 
-def eliminarTarea(contenido, id_tarea):
-    contenido["tareas"][id_tarea]["eliminada"] = True
+def eliminarTarea(id):
+    contenido = val.leerContenidoJson()
+    
+    contenido["tareas"][str(id)]["eliminada"] = True
     with open(PATH,"w") as f:
         json.dump(contenido,f,indent=4)
-    return 1
+    return True
 
 
-def listarTareas(contenido, estado, fecha):
+def listarTareas(estado, fecha):
+    contenido = val.leerContenidoJson()
     tareas = contenido["tareas"]
 
     res = {
         id_tarea: tarea for id_tarea,tarea in tareas.items()
-        if(not(estado.strip()) or tarea.get("estado") == estado)
-        and (not(fecha.strip()) or tarea.get("fecha_creacion") == fecha)
+        if(estado is None or tarea.get("estado") == estado)
+        and (fecha is None or tarea.get("fecha_creacion") == fecha)
         and (not(tarea.get("eliminada")))
     }
 

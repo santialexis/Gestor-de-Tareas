@@ -3,13 +3,7 @@ import os
 import datetime
 import json
 
-PATH = "Gestor-de-Tareas/tareas.json"
-
-class estadoTarea(Enum):
-    PENDIENTE = "Pendiente"
-    EN_CURSO = "En Curso"
-    TERMINADA = "Terminada"
-
+PATH = "tareas.json"
 
 def leerContenidoJson():
     try:
@@ -23,51 +17,41 @@ def leerContenidoJson():
     return contenido
 
 
-def validarOpcion(min,max):
-    while(True):
-        try:
-            opcion = int(input("-> "))
-        except ValueError:
-            print("Ingrese una opcion valida!")
-        else:
-            if(opcion < min or opcion > max):
-                print("Ingrese una opcion valida!")
-            else:
-                return opcion
+def escribirJson(contenido):
+    with open(PATH,"w") as f:
+        json.dump(contenido,f,indent=4)
 
 
-def validarEstado():
-    estados = [est.value.strip().lower() for est in estadoTarea]
+class estadoTarea(Enum):
+    PENDIENTE = "pendiente"
+    EN_CURSO = "en curso"
+    TERMINADA = "terminada"
+
+
+def validarEstado(estado):
+    estados = [est.value for est in estadoTarea]
     estados.append("")
-    while(True):
-        estado = input("-> ")
-        if(estado.strip().lower() not in estados):
-            print("Ingrese un estado valido!")
-        else:
-            return estado.capitalize()
+    
+    if(estado.strip().lower() not in estados):
+        return False
+    else:
+        return estado.capitalize()
         
-def validarFecha():
-    while(True):
-        fecha = input("-> ")
-        if(not fecha.strip()):
-            return fecha
-        try:
-            datetime.date.fromisoformat(fecha)
-            return fecha
-        except ValueError:
-            print("Fecha no valida!")
 
-def buscarTareaConId(contenido):
-    while(True):
-        id_tarea = input("-> ")
-        if(not id_tarea.strip()):
-            return None
+def validarFecha(fecha):
+    try:
+        datetime.date.fromisoformat(fecha)
+        return fecha
+    except ValueError:
+        print("Fecha no valida!")
 
-        tarea = contenido["tareas"].get(id_tarea)
-        if (tarea is None) or (tarea["eliminada"]):
-            print("ID no existente!")
-        else:
-            return id_tarea
+
+def existeId(id):
+    contenido = leerContenidoJson()
+    tarea = contenido["tareas"].get(str(id))
+    if (tarea is None) or (tarea["eliminada"]):
+        return False
+    return True
 
 
 def limpiarPantalla():
@@ -75,8 +59,3 @@ def limpiarPantalla():
         os.system("cls")
     else:
         os.system("clear")
-
-
-def continuar():
-    print("Presione Enter para continuar...")
-    input()
