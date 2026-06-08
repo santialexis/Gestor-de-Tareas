@@ -63,11 +63,12 @@ def eliminarTarea(id):
 def listarTareas(estado, fecha):
     contenido = val.leerContenidoJson()
     tareas = contenido["tareas"]
+    estado = estado.strip().lower()
 
     res = {
         id_tarea: tarea for id_tarea,tarea in tareas.items()
-        if(estado is None or tarea.get("estado") == estado)
-        and (fecha is None or tarea.get("fecha_creacion") == fecha)
+        if(estado is None or tarea.get("estado").lower() == estado)
+        and (fecha is None or tarea.get("fecha_creacion").lower() == fecha)
         and (not(tarea.get("eliminada")))
     }
 
